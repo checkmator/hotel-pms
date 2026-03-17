@@ -1,0 +1,13 @@
+{
+  "name": "hotel-pms",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev:backend": "npm -w @hotel-pms/backend run dev",
+    "dev:frontend": "npm -w @hotel-pms/frontend run dev",
+    "db:migrate": "npm -w @hotel-pms/backend run db:migrate",
+    "db:seed": "npm -w @hotel-pms/backend run db:seed",
+    "db:studio": "npm -w @hotel-pms/backend run db:studio"
+  }
+}

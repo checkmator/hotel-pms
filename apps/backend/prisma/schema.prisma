@@ -1,0 +1,303 @@
+// ============================================================
+// Hotel PMS — Prisma Schema
+// PostgreSQL · UUID primary keys · Row-level soft-delete ready
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────
+
+enum UserRole {
+  admin
+  reception
+  housekeeping
+}
+
+enum RoomType {
+  standard
+  deluxe
+  suite
+  master_suite
+}
+
+enum RoomStatus {
+  available
+  occupied
+  dirty
+  maintenance
+  blocked
+}
+
+enum ReservationStatus {
+  pending
+  confirmed
+  checked_in
+  checked_out
+  cancelled
+  no_show
+}
+
+enum TransactionCategory {
+  daily_rate
+  minibar
+  laundry
+  restaurant
+  room_service
+  parking
+  extra
+}
+
+enum PaymentMethod {
+  cash
+  credit_card
+  debit_card
+  pix
+  bank_transfer
+  invoice
+}
+
+enum TransactionStatus {
+  pending
+  paid
+  refunded
+  cancelled
+}
+
+enum InvoiceStatus {
+  open
+  closed
+  voided
+}
+
+enum AuditAction {
+  create
+  update
+  delete
+  login
+  logout
+}
+
+enum FiscalNoteStatus {
+  pending
+  emitted
+  cancelled
+  error
+}
+
+// ─── Models ──────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @db.VarChar(120)
+  email         String    @unique @db.VarChar(255)
+  passwordHash  String    @map("password_hash") @db.VarChar(255)
+  role          UserRole  @default(reception)
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  reservations        Reservation[]        @relation("CreatedBy")
+  transactions        Transaction[]        @relation("RegisteredBy")
+  invoicesClosedBy    Invoice[]            @relation("ClosedBy")
+  auditLogs           AuditLog[]
+  roomStatusChanges   RoomStatusHistory[]
+
+  @@map("users")
+}
+
+model Room {
+  id          String     @id @default(uuid()) @db.Uuid
+  number      String     @unique @db.VarChar(10)
+  type        RoomType
+  status      RoomStatus @default(available)
+  floor       Int
+  capacity    Int        @default(2)
+  basePrice   Decimal    @map("base_price") @db.Decimal(10, 2)
+  description String?    @db.Text
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  reservations    Reservation[]
+  statusHistory   RoomStatusHistory[]
+
+  @@map("rooms")
+}
+
+model Guest {
+  id           String    @id @default(uuid()) @db.Uuid
+  fullName     String    @map("full_name") @db.VarChar(120)
+  cpfPassport  String    @unique @map("cpf_passport") @db.VarChar(20)
+  email        String?   @db.VarChar(255)
+  phone        String?   @db.VarChar(20)
+  nationality  String?   @db.VarChar(60)
+  birthDate    DateTime? @map("birth_date") @db.Date
+  address      String?   @db.Text
+  notes        String?   @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  reservations Reservation[]
+
+  @@map("guests")
+}
+
+model Reservation {
+  id              String            @id @default(uuid()) @db.Uuid
+  guestId         String            @map("guest_id") @db.Uuid
+  roomId          String            @map("room_id") @db.Uuid
+  createdById     String            @map("created_by") @db.Uuid
+  checkInDate     DateTime          @map("check_in_date") @db.Date
+  checkOutDate    DateTime          @map("check_out_date") @db.Date
+  actualCheckIn   DateTime?         @map("actual_check_in")
+  actualCheckOut  DateTime?         @map("actual_check_out")
+  status          ReservationStatus @default(pending)
+  baseAmount      Decimal           @map("base_amount") @db.Decimal(10, 2)
+  discount        Decimal           @default(0) @db.Decimal(10, 2)
+  totalAmount     Decimal           @map("total_amount") @db.Decimal(10, 2)
+  notes           String?           @db.Text
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  guest        Guest         @relation(fields: [guestId], references: [id])
+  room         Room          @relation(fields: [roomId], references: [id])
+  createdBy    User          @relation("CreatedBy", fields: [createdById], references: [id])
+  transactions Transaction[]
+  invoices     Invoice[]
+  fiscalNotes  FiscalNote[]
+
+  @@index([guestId])
+  @@index([roomId])
+  @@index([checkInDate, checkOutDate])
+  @@index([status])
+  @@map("reservations")
+}
+
+model Transaction {
+  id              String              @id @default(uuid()) @db.Uuid
+  reservationId   String              @map("reservation_id") @db.Uuid
+  createdById     String              @map("created_by") @db.Uuid
+  category        TransactionCategory
+  description     String              @db.VarChar(255)
+  amount          Decimal             @db.Decimal(10, 2)
+  paymentMethod   PaymentMethod?      @map("payment_method")
+  status          TransactionStatus   @default(pending)
+  transactionDate DateTime            @default(now()) @map("transaction_date")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+  createdBy   User        @relation("RegisteredBy", fields: [createdById], references: [id])
+
+  @@index([reservationId])
+  @@index([status])
+  @@map("transactions")
+}
+
+model Invoice {
+  id            String        @id @default(uuid()) @db.Uuid
+  reservationId String        @map("reservation_id") @db.Uuid
+  closedById    String?       @map("closed_by") @db.Uuid
+  subtotal      Decimal       @db.Decimal(10, 2)
+  taxes         Decimal       @default(0) @db.Decimal(10, 2)
+  discounts     Decimal       @default(0) @db.Decimal(10, 2)
+  total         Decimal       @db.Decimal(10, 2)
+  status        InvoiceStatus @default(open)
+  closedAt      DateTime?     @map("closed_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  reservation Reservation  @relation(fields: [reservationId], references: [id])
+  closedBy    User?        @relation("ClosedBy", fields: [closedById], references: [id])
+  fiscalNotes FiscalNote[]
+
+  @@index([reservationId])
+  @@map("invoices")
+}
+
+model FiscalNote {
+  id                   String           @id @default(uuid()) @db.Uuid
+  reservationId        String           @map("reservation_id") @db.Uuid
+  invoiceId            String           @map("invoice_id") @db.Uuid
+
+  // Prestador (hotel)
+  prestadorCnpj        String           @map("prestador_cnpj") @db.VarChar(20)
+  prestadorRazaoSocial String           @map("prestador_razao_social") @db.VarChar(150)
+  prestadorIm          String?          @map("prestador_im") @db.VarChar(20)
+  prestadorMunicipio   String           @map("prestador_municipio") @db.VarChar(80)
+
+  // Tomador (guest / company)
+  tomadorDocumento     String           @map("tomador_documento") @db.VarChar(20)
+  tomadorNome          String           @map("tomador_nome") @db.VarChar(150)
+  tomadorEmail         String?          @map("tomador_email") @db.VarChar(255)
+
+  // Values
+  discriminacao        String           @db.Text
+  codigoServico        String           @default("0107") @map("codigo_servico") @db.VarChar(10)
+  valorServicos        Decimal          @map("valor_servicos") @db.Decimal(10, 2)
+  valorDeducoes        Decimal          @default(0) @map("valor_deducoes") @db.Decimal(10, 2)
+  baseCalculo          Decimal          @map("base_calculo") @db.Decimal(10, 2)
+  aliquotaIss          Decimal          @default(0.0500) @map("aliquota_iss") @db.Decimal(5, 4)
+  valorIss             Decimal          @map("valor_iss") @db.Decimal(10, 2)
+  valorLiquido         Decimal          @map("valor_liquido") @db.Decimal(10, 2)
+
+  // Control
+  status               FiscalNoteStatus @default(pending)
+  numero               String?          @db.VarChar(20)
+  serie                String           @default("1") @db.VarChar(5)
+  protocolo            String?          @db.VarChar(100)
+  codigoVerificacao    String?          @map("codigo_verificacao") @db.VarChar(50)
+  motivoCancelamento   String?          @map("motivo_cancelamento") @db.Text
+  errorMessage         String?          @map("error_message") @db.Text
+
+  createdAt            DateTime         @default(now()) @map("created_at")
+  emittedAt            DateTime?        @map("emitted_at")
+  cancelledAt          DateTime?        @map("cancelled_at")
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+  invoice     Invoice     @relation(fields: [invoiceId], references: [id])
+
+  @@index([reservationId])
+  @@index([invoiceId])
+  @@map("fiscal_notes")
+}
+
+model AuditLog {
+  id         String      @id @default(uuid()) @db.Uuid
+  userId     String      @map("user_id") @db.Uuid
+  entityType String      @map("entity_type") @db.VarChar(50)
+  entityId   String      @map("entity_id") @db.Uuid
+  action     AuditAction
+  oldValues  Json?       @map("old_values")
+  newValues  Json?       @map("new_values")
+  ipAddress  String?     @map("ip_address") @db.VarChar(45)
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model RoomStatusHistory {
+  id         String     @id @default(uuid()) @db.Uuid
+  roomId     String     @map("room_id") @db.Uuid
+  changedById String   @map("changed_by") @db.Uuid
+  oldStatus  RoomStatus @map("old_status")
+  newStatus  RoomStatus @map("new_status")
+  reason     String?    @db.Text
+  changedAt  DateTime   @default(now()) @map("changed_at")
+
+  room      Room @relation(fields: [roomId], references: [id])
+  changedBy User @relation(fields: [changedById], references: [id])
+
+  @@index([roomId])
+  @@map("room_status_history")
+}

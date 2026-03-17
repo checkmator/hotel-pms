@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual do Usuário — Hotel PMS</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #1f2937;
+      background: #f9fafb;
+    }
+    /* Layout */
+    .page { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: #1e293b;
+      color: #94a3b8;
+      padding: 24px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid #334155;
+    }
+    .sidebar-logo h1 { color: #fff; font-size: 16px; font-weight: 700; }
+    .sidebar-logo p  { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .sidebar nav { padding: 16px 0; }
+    .sidebar nav a {
+      display: block;
+      padding: 8px 20px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13px;
+      transition: background .15s;
+    }
+    .sidebar nav a:hover { background: #334155; color: #e2e8f0; }
+    .sidebar nav .section-label {
+      padding: 16px 20px 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #475569;
+      font-weight: 600;
+    }
+    .content {
+      margin-left: 240px;
+      flex: 1;
+      max-width: 860px;
+      padding: 40px 48px 80px;
+    }
+    /* Typography */
+    h1 { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+    h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin: 40px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+    h3 { font-size: 16px; font-weight: 600; color: #1e293b; margin: 24px 0 8px; }
+    h4 { font-size: 14px; font-weight: 600; color: #374151; margin: 16px 0 4px; }
+    p  { margin-bottom: 10px; color: #374151; }
+    ul, ol { padding-left: 20px; margin-bottom: 10px; color: #374151; }
+    li { margin-bottom: 4px; }
+    code {
+      background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 4px; padding: 1px 6px; font-size: 12px;
+      font-family: 'SF Mono', Consolas, monospace; color: #0f172a;
+    }
+    /* Components */
+    .cover {
+      background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+      border-radius: 16px; padding: 40px; margin-bottom: 32px; color: #fff;
+    }
+    .cover h1 { color: #fff; font-size: 32px; }
+    .cover p  { color: #bfdbfe; margin-bottom: 0; }
+    .cover .meta { margin-top: 16px; display: flex; gap: 24px; }
+    .cover .meta span { font-size: 12px; color: #93c5fd; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600;
+    }
+    .badge-blue   { background: #dbeafe; color: #1d4ed8; }
+    .badge-green  { background: #dcfce7; color: #15803d; }
+    .badge-yellow { background: #fef9c3; color: #a16207; }
+    .badge-red    { background: #fee2e2; color: #b91c1c; }
+    .badge-gray   { background: #f1f5f9; color: #475569; }
+    .badge-purple { background: #f3e8ff; color: #7e22ce; }
+    .info-box {
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px;
+      padding: 14px 16px; margin: 12px 0; display: flex; gap: 10px;
+    }
+    .info-box .icon { font-size: 18px; flex-shrink: 0; }
+    .warning-box {
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px;
+      padding: 14px 16px; margin: 12px 0; display: flex; gap: 10px;
+    }
+    .step-list { counter-reset: step; list-style: none; padding: 0; }
+    .step-list li {
+      counter-increment: step;
+      display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px;
+    }
+    .step-list li::before {
+      content: counter(step);
+      background: #2563eb; color: #fff;
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th { background: #f8fafc; text-align: left; padding: 8px 12px; font-size: 12px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 12px 0; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+    hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+    /* Print */
+    @media print {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 20px; max-width: 100%; }
+      .cover { background: #1e40af !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>🏨 Hotel PMS</h1>
+      <p>Manual do Usuário</p>
+    </div>
+    <nav>
+      <div class="section-label">Introdução</div>
+      <a href="#visao-geral">Visão Geral</a>
+      <a href="#login">Login e Acesso</a>
+      <a href="#perfis">Perfis de Acesso</a>
+
+      <div class="section-label">Operações</div>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#mapa">Mapa de Ocupação</a>
+      <a href="#checkin">Check-in</a>
+      <a href="#consumo">Lançar Consumo</a>
+      <a href="#checkout">Check-out</a>
+
+      <div class="section-label">Cadastros</div>
+      <a href="#reservas">Reservas</a>
+      <a href="#hospedes">Hóspedes</a>
+      <a href="#quartos">Quartos</a>
+
+      <div class="section-label">Gestão</div>
+      <a href="#governanca">Governança</a>
+      <a href="#relatorios">Relatórios</a>
+      <a href="#nfse">Nota Fiscal (NFS-e)</a>
+      <a href="#funcionarios">Funcionários</a>
+      <a href="#auditoria">Auditoria</a>
+
+      <div class="section-label">Referência</div>
+      <a href="#status-quartos">Status dos Quartos</a>
+      <a href="#status-reservas">Status das Reservas</a>
+      <a href="#faq">Perguntas Frequentes</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <!-- Cover -->
+    <div class="cover">
+      <h1>Manual do Usuário</h1>
+      <p>Guia completo para operação do sistema Hotel PMS — gerenciamento de reservas, check-in/out, governança, finanças e emissão de NFS-e.</p>
+      <div class="meta">
+        <span>📅 Versão 1.0 — Março 2026</span>
+        <span>🔒 Uso interno</span>
+      </div>
+    </div>
+
+    <!-- ── Visão Geral ── -->
+    <h2 id="visao-geral">Visão Geral do Sistema</h2>
+    <p>O <strong>Hotel PMS</strong> é um sistema de gestão hoteleira que centraliza todas as operações do hotel: reservas, check-in, check-out, consumo do hóspede, limpeza, relatórios financeiros e emissão de nota fiscal eletrônica (NFS-e).</p>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>🌐 Acesso</h4>
+        <p>Acesse pelo navegador em <code>http://localhost:3000</code><br/>
+        Compatível com Chrome, Firefox, Edge e Safari.</p>
+      </div>
+      <div class="card">
+        <h4>📱 Responsivo</h4>
+        <p>O sistema funciona em desktops e tablets. Para uso em smartphones, prefira as telas de Mapa e Governança.</p>
+      </div>
+    </div>
+
+    <!-- ── Login ── -->
+    <h2 id="login">Login e Acesso</h2>
+    <ol class="step-list">
+      <li>Abra o navegador e acesse o endereço do sistema.</li>
+      <li>Insira seu <strong>e-mail</strong> e <strong>senha</strong> fornecidos pelo administrador.</li>
+      <li>Clique em <strong>"Entrar"</strong>. O sistema redireciona para o Dashboard.</li>
+      <li>Para sair, clique no nome de usuário no canto inferior esquerdo e selecione <strong>"Sair"</strong>.</li>
+    </ol>
+
+    <div class="info-box">
+      <span class="icon">ℹ️</span>
+      <div>A sessão expira automaticamente após <strong>8 horas</strong> sem atividade. O sistema redireciona para a tela de login quando isso ocorre.</div>
+    </div>
+
+    <!-- ── Perfis ── -->
+    <h2 id="perfis">Perfis de Acesso</h2>
+    <p>O sistema possui três perfis, cada um com permissões específicas:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Perfil</th>
+          <th>Funcionalidades</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-purple">Administrador</span></td>
+          <td>Acesso total: reservas, quartos, hóspedes, check-in/out, relatórios, NFS-e, funcionários, auditoria.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">Recepção</span></td>
+          <td>Reservas, check-in, check-out, consumo, hóspedes, mapa de ocupação, relatórios.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-green">Governança</span></td>
+          <td>Mapa de ocupação (somente atualizar status de limpeza), painel de governança.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ── Dashboard ── -->
+    <h2 id="dashboard">Dashboard</h2>
+    <p>A tela inicial mostra um resumo em tempo real do hotel:</p>
+
+    <div class="two-col">
+      <div class="card">
+        <h4>📊 KPIs</h4>
+        <ul>
+          <li><strong>Check-ins Hoje</strong> — realizados e pendentes</li>
+          <li><strong>Check-outs Hoje</strong> — concluídos no dia</li>
+          <li><strong>Ocupação Atual</strong> — % de quartos ocupados</li>
+          <li><strong>Receita do Mês</strong> — total de faturas fechadas</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>📈 Painéis</h4>
+        <ul>
+          <li><strong>Status dos Quartos</strong> — barra empilhada com distribuição</li>
+          <li><strong>Próximos Check-ins</strong> — reservas dos próximos 7 dias</li>
+          <li><strong>Atividade Recente</strong> — últimas reservas criadas</li>
+          <li><strong>Receita Mensal</strong> — gráfico dos últimos 12 meses</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <span class="icon">⚠️</span>
+      <div>Um <strong>alerta amarelo</strong> aparece automaticamente quando há reservas com check-in previsto para hoje que ainda não foram realizadas. Clique em "Ver mapa" para tratá-las.</div>
+    </div>
+
+    <!-- ── Mapa ── -->
+    <h2 id="mapa">Mapa de Ocupação</h2>
+    <p>O Mapa exibe todos os quartos do hotel organizados por andar, com seu status visual em tempo real. É a tela central de operações da recepção.</p>
+
+    <h3>Filtros</h3>
+    <p>Use os botões no topo para filtrar por status: <span class="badge badge-gray">Todos</span> <span class="badge badge-green">Disponível</span> <span class="badge badge-blue">Ocupado</span> <span class="badge badge-yellow">Sujo</span> <span class="badge badge-red">Manutenção</span></p>
+
+    <h3>Ações por Quarto</h3>
+    <p>Clique em qualquer quarto para abrir o painel de ações disponíveis conforme o status:</p>
+    <table>
+      <thead><tr><th>Status do Quarto</th><th>Ações Disponíveis</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-green">Disponível</span></td><td>Realizar Check-in</td></tr>
+        <tr><td><span class="badge badge-blue">Ocupado</span></td><td>Lançar Consumo, Realizar Check-out</td></tr>
+        <tr><td><span class="badge badge-yellow">Sujo</span></td><td>Marcar como Disponível (após limpeza), Colocar em Manutenção</td></tr>
+        <tr><td><span class="badge badge-red">Manutenção</span></td><td>Marcar como Disponível (após reparo)</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ── Check-in ── -->
+    <h2 id="checkin">Realizar Check-in</h2>
+    <ol class="step-list">
+      <li>No <strong>Mapa de Ocupação</strong>, localize um quarto <span class="badge badge-green">Disponível</span> e clique nele.</li>
+      <li>Clique no botão <strong>"Check-in"</strong>.</li>
+      <li>No campo de busca, digite o <strong>nome, CPF ou e-mail</strong> do hóspede.</li>
+      <li>Selecione a reserva correspondente na lista de resultados.</li>
+      <li>Confirme os dados e clique em <strong>"Confirmar Check-in"</strong>.</li>
+    </ol>
+
+    <div class="info-box">
+      <span class="icon">ℹ️</span>
+      <div>O check-in só é permitido para reservas com status <strong>Confirmada</strong> ou <strong>Pendente</strong>, e dentro da janela de ±1 dia da data prevista.</div>
+    </div>
+
+    <!-- ── Consumo ── -->
+    <h2 id="consumo">Lançar Consumo</h2>
+    <p>Durante a estadia, é possível registrar todos os consumos do hóspede diretamente no sistema.</p>
+    <ol class="step-list">
+      <li>No Mapa, clique no quarto <span class="badge badge-blue">Ocupado</span>.</li>
+      <li>Clique em <strong>"Lançar Consumo"</strong>.</li>
+      <li>Selecione a <strong>categoria</strong> do item.</li>
+      <li>Preencha a <strong>descrição</strong> e o <strong>valor</strong>.</li>
+      <li>Clique em <strong>"Adicionar"</strong>. O lançamento aparece na lista de consumo da reserva.</li>
+    </ol>
+
+    <h3>Categorias disponíveis</h3>
+    <div class="two-col">
+      <ul>
+        <li>🛏️ <strong>Diária</strong></li>
+        <li>🍽️ <strong>Restaurante</strong></li>
+        <li>🧺 <strong>Lavanderia</strong></li>
+        <li>🛎️ <strong>Room Service</strong></li>
+      </ul>
+      <ul>
+        <li>🍾 <strong>Frigobar</strong></li>
+        <li>🚗 <strong>Estacionamento</strong></li>
+        <li>➕ <strong>Extra</strong> (outros)</li>
+      </ul>
+    </div>
+
+    <!-- ── Check-out ── -->
+    <h2 id="checkout">Realizar Check-out</h2>
+    <ol class="step-list">
+      <li>No Mapa, clique no quarto <span class="badge badge-blue">Ocupado</span>.</li>
+      <li>Clique em <strong>"Check-out"</strong>.</li>
+      <li>O sistema exibe o <strong>resumo da fatura</strong>: subtotal, desconto, ISS (5%) e total.</li>
+      <li>Selecione a <strong>forma de pagamento</strong>: Dinheiro, Cartão de Crédito, Débito, PIX ou Transferência.</li>
+      <li>Clique em <strong>"Fechar Conta"</strong>.</li>
+      <li>Na tela de confirmação, clique em <strong>"Imprimir Fatura"</strong> para gerar o comprovante em PDF.</li>
+    </ol>
+
+    <div class="warning-box">
+      <span class="icon">⚠️</span>
+      <div>Após o check-out, o quarto é automaticamente marcado como <strong>Sujo</strong>. A equipe de governança deve limpá-lo antes que ele apareça disponível para novos check-ins.</div>
+    </div>
+
+    <!-- ── Reservas ── -->
+    <h2 id="reservas">Reservas</h2>
+    <p>A tela de Reservas permite criar, consultar e gerenciar todas as reservas do hotel.</p>
+
+    <h3>Criar Nova Reserva</h3>
+    <ol class="step-list">
+      <li>Clique em <strong>"Nova Reserva"</strong>.</li>
+      <li>Selecione o <strong>hóspede</strong> (busca por nome ou CPF) ou cadastre um novo.</li>
+      <li>Selecione o <strong>quarto</strong> disponível para o período.</li>
+      <li>Defina as datas de <strong>check-in</strong> e <strong>check-out</strong>.</li>
+      <li>Ajuste o <strong>desconto</strong> se necessário e adicione <strong>observações</strong>.</li>
+      <li>Clique em <strong>"Criar Reserva"</strong>.</li>
+    </ol>
+
+    <h3>Cancelar Reserva</h3>
+    <p>Clique no ícone <strong>✗</strong> na linha da reserva. Só é possível cancelar reservas com status <span class="badge badge-blue">Confirmada</span> ou <span class="badge badge-yellow">Pendente</span>.</p>
+
+    <h3>Filtros e Busca</h3>
+    <p>Use a barra de busca para filtrar por nome do hóspede ou número do quarto. Use os filtros de status para visualizar reservas por categoria.</p>
+
+    <!-- ── Hóspedes ── -->
+    <h2 id="hospedes">Hóspedes</h2>
+    <p>Cadastro completo de hóspedes com histórico de estadias.</p>
+
+    <h3>Campos obrigatórios</h3>
+    <table>
+      <thead><tr><th>Campo</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td>Nome completo</td><td>Nome como consta no documento</td></tr>
+        <tr><td>CPF / Passaporte</td><td>Documento de identificação (somente dígitos para CPF)</td></tr>
+        <tr><td>E-mail</td><td>Usado para envio de NFS-e e comunicações</td></tr>
+        <tr><td>Telefone</td><td>Contato principal</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ── Quartos ── -->
+    <h2 id="quartos">Quartos</h2>
+    <p>Gerenciamento do inventário de quartos do hotel.</p>
+
+    <h3>Tipos de Quarto</h3>
+    <table>
+      <thead><tr><th>Tipo</th><th>Descrição típica</th></tr></thead>
+      <tbody>
+        <tr><td>Standard</td><td>Quarto básico, sem diferencial específico</td></tr>
+        <tr><td>Deluxe</td><td>Quarto superior com melhor vista ou mobiliário</td></tr>
+        <tr><td>Suíte</td><td>Sala separada, banheira e amenidades premium</td></tr>
+        <tr><td>Suíte Master</td><td>Maior categoria, múltiplos ambientes</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Criar / Editar Quarto</h3>
+    <p>Clique em <strong>"Novo Quarto"</strong> ou no ícone de lápis em um quarto existente. Preencha número, andar, tipo, capacidade e diária base.</p>
+
+    <div class="info-box">
+      <span class="icon">ℹ️</span>
+      <div>Quartos com reservas vinculadas <strong>não podem ser excluídos</strong>. O botão de exclusão aparece desativado nesses casos.</div>
+    </div>
+
+    <!-- ── Governança ── -->
+    <h2 id="governanca">Governança (Limpeza)</h2>
+    <p>Painel exclusivo para a equipe de limpeza e governança. Exibe todos os quartos que precisam de atenção.</p>
+
+    <ol class="step-list">
+      <li>Acesse o menu <strong>"Governança"</strong>.</li>
+      <li>Visualize os quartos com status <span class="badge badge-yellow">Sujo</span> ou <span class="badge badge-red">Manutenção</span>.</li>
+      <li>Após limpar o quarto, clique nele e selecione <strong>"Marcar como Disponível"</strong>.</li>
+      <li>Se o quarto precisar de reparo, selecione <strong>"Enviar para Manutenção"</strong>.</li>
+    </ol>
+
+    <div class="warning-box">
+      <span class="icon">⚠️</span>
+      <div>O perfil <strong>Governança</strong> só pode alterar quartos para <strong>Disponível</strong> ou <strong>Manutenção</strong>. Não é possível fazer check-in ou check-out por esse perfil.</div>
+    </div>
+
+    <!-- ── Relatórios ── -->
+    <h2 id="relatorios">Relatórios</h2>
+    <p>A tela de Relatórios oferece análise financeira e de ocupação com filtros de período.</p>
+
+    <h3>Aba Receita</h3>
+    <table>
+      <thead><tr><th>Indicador</th><th>O que representa</th></tr></thead>
+      <tbody>
+        <tr><td>Receita Total</td><td>Soma de todas as faturas fechadas no período</td></tr>
+        <tr><td>Subtotal (sem imposto)</td><td>Receita bruta antes do ISS</td></tr>
+        <tr><td>Descontos Aplicados</td><td>Total de descontos concedidos</td></tr>
+        <tr><td>Check-outs no Período</td><td>Número de reservas finalizadas</td></tr>
+      </tbody>
+    </table>
+    <p>O <strong>gráfico de barras</strong> mostra a receita diária no período selecionado. Passe o mouse sobre as barras para ver o valor exato de cada dia.</p>
+    <p>A seção <strong>Receita por Categoria</strong> detalha quanto cada tipo de serviço (Diária, Restaurante, Room Service, etc.) contribuiu para o total.</p>
+
+    <h3>Aba Ocupação</h3>
+    <p>Exibe a <strong>taxa média de ocupação</strong> no período e um gráfico diário. A tabela abaixo mostra o detalhe dia a dia dos últimos 14 dias do período.</p>
+
+    <div class="info-box">
+      <span class="icon">💡</span>
+      <div>Taxa de ocupação acima de <strong>75%</strong> aparece em verde, entre 40% e 75% em amarelo, e abaixo de 40% em vermelho.</div>
+    </div>
+
+    <!-- ── NFS-e ── -->
+    <h2 id="nfse">Nota Fiscal Eletrônica (NFS-e)</h2>
+    <p>O sistema suporta emissão de NFS-e (Nota Fiscal de Serviços Eletrônica) conforme a LC 116/2003, item 9.01 — Hospedagem. O ISS aplicado é de <strong>5%</strong>.</p>
+
+    <h3>Como emitir</h3>
+    <ol class="step-list">
+      <li>Acesse a tela de <strong>Reservas</strong>.</li>
+      <li>Localize uma reserva com status <span class="badge badge-gray">Finalizada</span>.</li>
+      <li>Clique no ícone de <strong>documento</strong> (📄) na linha da reserva.</li>
+      <li>No modal, clique em <strong>"Gerar NFS-e"</strong> para criar o documento fiscal.</li>
+      <li>Revise os dados e clique em <strong>"Emitir"</strong>.</li>
+      <li>Após a emissão, o número e o código de verificação serão exibidos.</li>
+    </ol>
+
+    <h3>Status da NFS-e</h3>
+    <table>
+      <thead><tr><th>Status</th><th>Significado</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-yellow">Pendente</span></td><td>Gerada mas ainda não transmitida ao município</td></tr>
+        <tr><td><span class="badge badge-green">Emitida</span></td><td>Transmitida e aceita pela prefeitura</td></tr>
+        <tr><td><span class="badge badge-red">Cancelada</span></td><td>Cancelada mediante justificativa</td></tr>
+        <tr><td><span class="badge badge-red">Erro</span></td><td>Falha na comunicação com o provedor fiscal</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning-box">
+      <span class="icon">⚠️</span>
+      <div><strong>Modo simulação:</strong> se o sistema exibir uma mensagem de modo simulação, as notas emitidas são fictícias (para testes). Para ativar a emissão real, o administrador deve configurar as credenciais do provedor NFS-e no arquivo <code>.env</code> do servidor.</div>
+    </div>
+
+    <h3>Cancelamento</h3>
+    <p>Somente notas com status <span class="badge badge-green">Emitida</span> podem ser canceladas. Informe o motivo do cancelamento (mínimo de 15 caracteres exigido pela prefeitura).</p>
+
+    <!-- ── Funcionários ── -->
+    <h2 id="funcionarios">Funcionários</h2>
+    <p>Gerenciamento de usuários do sistema (somente <span class="badge badge-purple">Administrador</span>).</p>
+
+    <h3>Criar Funcionário</h3>
+    <ol class="step-list">
+      <li>Acesse <strong>"Funcionários"</strong> no menu lateral.</li>
+      <li>Clique em <strong>"Novo Funcionário"</strong>.</li>
+      <li>Preencha nome, e-mail, perfil e senha temporária.</li>
+      <li>Clique em <strong>"Criar"</strong>. O usuário poderá alterar a senha no primeiro acesso.</li>
+    </ol>
+
+    <h3>Desativar Funcionário</h3>
+    <p>Clique no toggle de <strong>Ativo/Inativo</strong> na linha do funcionário. Funcionários inativos não conseguem fazer login. <strong>Atenção:</strong> não é possível desativar sua própria conta.</p>
+
+    <!-- ── Auditoria ── -->
+    <h2 id="auditoria">Auditoria</h2>
+    <p>Log completo de todas as ações realizadas no sistema, com filtros por tipo de entidade, ação e período (somente <span class="badge badge-purple">Administrador</span>).</p>
+
+    <p>Para cada registro é possível expandir e visualizar os <strong>valores anteriores e posteriores</strong> à alteração, facilitando a rastreabilidade de mudanças financeiras e operacionais.</p>
+
+    <!-- ── Status Quartos ── -->
+    <h2 id="status-quartos">Referência: Status dos Quartos</h2>
+    <table>
+      <thead><tr><th>Status</th><th>Cor</th><th>Descrição</th><th>Próxima ação</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-green">Disponível</span></td><td>Verde</td><td>Limpo e pronto para check-in</td><td>Realizar check-in</td></tr>
+        <tr><td><span class="badge badge-blue">Ocupado</span></td><td>Azul</td><td>Hóspede hospedado</td><td>Lançar consumo ou checkout</td></tr>
+        <tr><td><span class="badge badge-yellow">Sujo</span></td><td>Amarelo</td><td>Aguardando limpeza (pós-checkout)</td><td>Governança limpa → Disponível</td></tr>
+        <tr><td><span class="badge badge-red">Manutenção</span></td><td>Laranja</td><td>Em reparos ou interditado</td><td>Após reparo → Disponível</td></tr>
+        <tr><td><span class="badge badge-gray">Bloqueado</span></td><td>Cinza</td><td>Bloqueado por decisão gerencial</td><td>Admin desbloqueia manualmente</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ── Status Reservas ── -->
+    <h2 id="status-reservas">Referência: Status das Reservas</h2>
+    <table>
+      <thead><tr><th>Status</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-yellow">Pendente</span></td><td>Reserva criada, aguardando confirmação</td></tr>
+        <tr><td><span class="badge badge-blue">Confirmada</span></td><td>Confirmada, check-in ainda não realizado</td></tr>
+        <tr><td><span class="badge badge-green">Hospedado</span></td><td>Check-in realizado, hóspede no hotel</td></tr>
+        <tr><td><span class="badge badge-gray">Finalizada</span></td><td>Check-out realizado, fatura fechada</td></tr>
+        <tr><td><span class="badge badge-red">Cancelada</span></td><td>Cancelada antes do check-in</td></tr>
+        <tr><td><span class="badge badge-red">No-show</span></td><td>Hóspede não compareceu na data prevista</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ── FAQ ── -->
+    <h2 id="faq">Perguntas Frequentes</h2>
+
+    <h3>O quarto ficou como "Sujo" após o check-out. Como liberar?</h3>
+    <p>A equipe de governança deve acessar o Mapa ou o painel de Governança, clicar no quarto e selecionar <strong>"Marcar como Disponível"</strong> após a limpeza.</p>
+
+    <h3>Não consigo fazer check-in. O que fazer?</h3>
+    <p>Verifique se: (1) a reserva está com status <strong>Confirmada</strong> ou <strong>Pendente</strong>; (2) a data de check-in está dentro de ±1 dia da data atual; (3) o quarto está <strong>Disponível</strong>.</p>
+
+    <h3>Como imprimir a fatura do hóspede?</h3>
+    <p>Após o check-out, clique no ícone de impressora 🖨️ na linha da reserva (tela de Reservas) ou clique em "Imprimir Fatura" na tela de confirmação do check-out. O navegador abrirá a caixa de diálogo de impressão — selecione "Salvar como PDF" para gerar o arquivo.</p>
+
+    <h3>A NFS-e emitida mostra "modo simulação". É um problema?</h3>
+    <p>Não, em ambiente de homologação/testes isso é esperado. Para emissão real, o administrador deve configurar as credenciais do provedor fiscal (Nuvem Fiscal ou Focus NFe) no arquivo <code>.env</code> do servidor.</p>
+
+    <h3>Como alterar a senha de um funcionário?</h3>
+    <p>Acesse <strong>Funcionários</strong>, clique no ícone de edição e preencha a nova senha no campo correspondente. Se deixar em branco, a senha não é alterada.</p>
+
+    <h3>Como exportar relatórios?</h3>
+    <p>Na tela de Relatórios, pressione <strong>Ctrl+P</strong> (ou Cmd+P no Mac) e selecione "Salvar como PDF" para exportar a página atual.</p>
+
+    <h3>O sistema deslogou sozinho. Por quê?</h3>
+    <p>A sessão tem duração de <strong>8 horas</strong>. Após esse período, o sistema redireciona automaticamente para a tela de login por segurança.</p>
+
+    <hr />
+    <p style="text-align:center; color: #94a3b8; font-size: 12px;">
+      Hotel PMS — Manual do Usuário v1.0 · Março 2026<br/>
+      Para suporte técnico, contate o administrador do sistema.
+    </p>
+
+  </main>
+</div>
+</body>
+</html>
