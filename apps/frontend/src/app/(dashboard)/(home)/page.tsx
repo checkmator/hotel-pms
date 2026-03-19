@@ -1,5 +1,3 @@
-import DashboardContent from '../DashboardContent';
+'use client';
 
-export default function DashboardPage() {
-  return <DashboardContent />;
-}
+export { default } from '../DashboardContent';
