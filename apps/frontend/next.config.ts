@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    // Turbopack is used only in dev (next dev --turbopack)
-    // Production build uses the standard webpack bundler
-  },
+  outputFileTracingRoot: path.join(__dirname, "../../"),
 };
 
 export default nextConfig;
