@@ -36,6 +36,13 @@ export default function LoginPage() {
     }
   };
 
+  const bypassLogin = () => {
+    const fakeUser = { id: 'bypass', name: 'Admin Geral', email: 'admin@hotel.com', role: 'admin' };
+    document.cookie = 'hotel_token=bypass-token; path=/; max-age=86400';
+    document.cookie = `hotel_user=${encodeURIComponent(JSON.stringify(fakeUser))}; path=/; max-age=86400`;
+    router.push('/');
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-slate-100 p-4">
       <div className="w-full max-w-md">
@@ -89,6 +96,14 @@ export default function LoginPage() {
               Entrar
             </Button>
           </form>
+
+          <button
+            type="button"
+            onClick={bypassLogin}
+            className="mt-4 w-full rounded-lg border border-dashed border-orange-300 bg-orange-50 py-2 text-sm text-orange-700 hover:bg-orange-100 transition-colors"
+          >
+            ⚡ Acesso direto (temporário)
+          </button>
 
           {/* Demo credentials */}
           <div className="mt-6 rounded-lg bg-gray-50 border border-gray-200 p-3 text-xs text-gray-500 space-y-1">
