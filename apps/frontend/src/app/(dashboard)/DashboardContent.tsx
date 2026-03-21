@@ -113,20 +113,30 @@ function MonthlyChart({ months }: { months: MonthlyRevenue[] }) {
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
+const EMPTY_DASHBOARD = {
+  today: { date: new Date().toISOString().split('T')[0], checkInsCompleted: 0, checkOutsCompleted: 0, pendingCheckIns: 0 },
+  rooms: { total: 0, occupancyRate: 0, byStatus: {} as Record<string, number> },
+  revenue: { monthTotal: 0, monthLabel: '—', invoiceCount: 0 },
+  upcomingCheckIns: [] as any[],
+  recentReservations: [] as any[],
+};
+
 export default function DashboardContent() {
   const { data, isLoading } = useQuery({
     queryKey: ['dashboard'],
     queryFn: dashboardService.get,
     refetchInterval: 60_000,
+    retry: 1,
   });
 
   const { data: monthlyData } = useQuery({
     queryKey: ['revenue-monthly'],
     queryFn: () => reportsService.revenueMonthly(12),
     staleTime: 5 * 60_000,
+    retry: 1,
   });
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <div className="flex flex-col h-full">
         <Header title="Dashboard" subtitle="Visão geral do hotel" />
@@ -137,7 +147,7 @@ export default function DashboardContent() {
     );
   }
 
-  const { today, rooms, revenue, upcomingCheckIns, recentReservations } = data;
+  const { today, rooms, revenue, upcomingCheckIns, recentReservations } = data ?? EMPTY_DASHBOARD;
 
   const roomStatuses: RoomStatus[] = ['available', 'occupied', 'dirty', 'maintenance', 'blocked'];
 
