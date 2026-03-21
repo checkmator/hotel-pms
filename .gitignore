@@ -17,8 +17,8 @@ build/
 .env.test.local
 .env.production.local
 
-# Prisma
-apps/backend/prisma/migrations/*/migration.sql
+# Prisma (migration SQL files must be committed for Railway deploy)
+# apps/backend/prisma/migrations/*/migration.sql
 
 # Logs
 *.log
