@@ -275,7 +275,7 @@ export default function DashboardContent() {
                       <p className="text-xs text-gray-400">Quarto {r.room.number} · {fmtDate(r.checkInDate)} → {fmtDate(r.checkOutDate)}</p>
                     </div>
                     <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_PILL[r.status as ReservationStatus]}`}>
-                      {STATUS_LABELS[r.status]}
+                      {STATUS_LABELS[r.status as ReservationStatus]}
                     </span>
                   </div>
                 ))}
