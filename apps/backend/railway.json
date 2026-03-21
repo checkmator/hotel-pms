@@ -6,7 +6,7 @@
     "watchPatterns": ["src/**", "prisma/**"]
   },
   "deploy": {
-    "startCommand": "npm run db:migrate:deploy && npm run start",
+    "startCommand": "npm run db:migrate:deploy && npm run db:seed && npm run start",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 30,
     "restartPolicyType": "ON_FAILURE",
