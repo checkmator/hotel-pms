@@ -274,7 +274,7 @@ export default function DashboardContent() {
                       <p className="text-sm font-medium text-gray-900 truncate">{r.guest.fullName}</p>
                       <p className="text-xs text-gray-400">Quarto {r.room.number} · {fmtDate(r.checkInDate)} → {fmtDate(r.checkOutDate)}</p>
                     </div>
-                    <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_PILL[r.status]}`}>
+                    <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_PILL[r.status as ReservationStatus]}`}>
                       {STATUS_LABELS[r.status]}
                     </span>
                   </div>
