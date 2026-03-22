@@ -122,7 +122,7 @@ export default function AuditPage() {
     <div className="flex flex-col h-full">
       <Header title="Auditoria" subtitle="Registro de todas as ações no sistema" />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
         {/* Filters */}
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex flex-wrap items-end gap-3">

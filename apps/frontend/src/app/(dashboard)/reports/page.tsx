@@ -104,7 +104,7 @@ export default function ReportsPage() {
     <div className="flex flex-col h-full">
       <Header title="Relatórios" subtitle="Ocupação, receita e análises" />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
         {/* Date range filter */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">

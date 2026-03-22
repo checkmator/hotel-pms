@@ -8,7 +8,7 @@ export default function HousekeepingPage() {
         title="Governança"
         subtitle="Gerencie o status de limpeza dos quartos"
       />
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6">
         <HousekeepingBoard />
       </div>
     </div>

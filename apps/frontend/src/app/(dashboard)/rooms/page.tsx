@@ -146,7 +146,7 @@ export default function RoomsPage() {
     <div className="flex flex-col h-full">
       <Header title="Quartos" subtitle={`${total} quartos cadastrados`} />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
         {/* Stats chips */}
         <div className="flex flex-wrap gap-2">
           {Object.entries(STATUS_LABELS).map(([s, label]) => (

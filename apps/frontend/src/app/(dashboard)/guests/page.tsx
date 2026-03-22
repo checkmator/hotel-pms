@@ -44,7 +44,7 @@ export default function GuestsPage() {
     <div className="flex flex-col h-full">
       <Header title="Hóspedes" subtitle={`${data?.meta.total ?? 0} cadastrados`} />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative max-w-sm flex-1">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />

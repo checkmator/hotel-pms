@@ -158,7 +158,7 @@ export default function DashboardContent() {
         subtitle={`Hoje, ${new Date(today.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}`}
       />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
         {/* KPI Row */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard

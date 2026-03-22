@@ -159,7 +159,7 @@ export default function UsersPage() {
     <div className="flex flex-col h-full">
       <Header title="Funcionários" subtitle="Gerencie os usuários do sistema" />
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4">
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px]">
