@@ -9,7 +9,7 @@ export function ShellLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* Mobile overlay */}
+      {/* Overlay (mobile only) */}
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/40 lg:hidden"
@@ -17,24 +17,18 @@ export function ShellLayout({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* Sidebar — drawer on mobile, static on desktop */}
-      <div
-        className={[
-          'fixed inset-y-0 left-0 z-50 transition-transform duration-200 lg:static lg:translate-x-0 lg:flex',
-          open ? 'translate-x-0 flex' : '-translate-x-full',
-        ].join(' ')}
-      >
+      {/* Sidebar */}
+      <div className={open ? 'fixed inset-y-0 left-0 z-50 flex lg:static' : 'hidden lg:flex'}>
         <Sidebar onClose={() => setOpen(false)} />
       </div>
 
-      {/* Main area */}
+      {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Mobile top bar */}
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:hidden">
+        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:hidden">
           <button
             onClick={() => setOpen(true)}
             className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100"
-            aria-label="Abrir menu"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -44,7 +38,7 @@ export function ShellLayout({ children }: { children: React.ReactNode }) {
             </div>
             <span className="text-sm font-bold text-gray-900">Hotel PMS</span>
           </div>
-        </header>
+        </div>
 
         <main className="flex-1 overflow-y-auto">
           {children}
