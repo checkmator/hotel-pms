@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 
+
 const schema = z.object({
   email: z.string().email('E-mail inválido.'),
   password: z.string().min(6, 'Mínimo 6 caracteres.'),
@@ -34,13 +35,6 @@ export default function LoginPage() {
     } catch {
       setError('E-mail ou senha incorretos.');
     }
-  };
-
-  const bypassLogin = () => {
-    const fakeUser = { id: 'bypass', name: 'Admin Geral', email: 'admin@hotel.com', role: 'admin' };
-    document.cookie = 'hotel_token=bypass-token; path=/; max-age=86400';
-    document.cookie = `hotel_user=${encodeURIComponent(JSON.stringify(fakeUser))}; path=/; max-age=86400`;
-    router.push('/');
   };
 
   return (
@@ -96,14 +90,6 @@ export default function LoginPage() {
               Entrar
             </Button>
           </form>
-
-          <button
-            type="button"
-            onClick={bypassLogin}
-            className="mt-4 w-full rounded-lg border border-dashed border-orange-300 bg-orange-50 py-2 text-sm text-orange-700 hover:bg-orange-100 transition-colors"
-          >
-            ⚡ Acesso direto (temporário)
-          </button>
 
           {/* Demo credentials */}
           <div className="mt-6 rounded-lg bg-gray-50 border border-gray-200 p-3 text-xs text-gray-500 space-y-1">
