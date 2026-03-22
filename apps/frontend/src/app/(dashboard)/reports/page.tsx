@@ -71,7 +71,7 @@ function KpiCard({ label, value, sub, icon: Icon, color }: {
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-xs text-gray-500 font-medium leading-tight">{label}</p>
-        <p className="text-base font-bold text-gray-900 mt-0.5 break-all sm:text-lg">{value}</p>
+        <p className="text-base font-bold text-gray-900 mt-0.5 leading-tight sm:text-lg">{value}</p>
         {sub && <p className="text-xs text-gray-400 mt-0.5 leading-tight">{sub}</p>}
       </div>
     </div>
