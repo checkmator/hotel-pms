@@ -30,8 +30,11 @@ export async function buildApp() {
   const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
   await app.register(cors, {
     origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      cb(new Error('Not allowed by CORS'), false);
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        return cb(null, true);
+      }
+      cb(null, false);
     },
     credentials: true,
   });
