@@ -160,7 +160,7 @@ export default function DashboardContent() {
 
       <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
         {/* KPI Row */}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard
             label="Check-ins Hoje"
             value={today.checkInsCompleted}
