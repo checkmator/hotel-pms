@@ -65,14 +65,14 @@ function KpiCard({ label, value, sub, icon: Icon, color }: {
   icon: React.ElementType; color: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-start gap-4">
-      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${color}`}>
-        <Icon className="h-5 w-5 text-white" />
+    <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-start gap-3">
+      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${color}`}>
+        <Icon className="h-4 w-4 text-white" />
       </div>
-      <div>
-        <p className="text-xs text-gray-500 font-medium">{label}</p>
-        <p className="text-xl font-bold text-gray-900 mt-0.5">{value}</p>
-        {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-gray-500 font-medium leading-tight">{label}</p>
+        <p className="text-base font-bold text-gray-900 mt-0.5 break-all sm:text-lg">{value}</p>
+        {sub && <p className="text-xs text-gray-400 mt-0.5 leading-tight">{sub}</p>}
       </div>
     </div>
   );
@@ -147,7 +147,7 @@ export default function ReportsPage() {
         {tab === 'revenue' && (
           <div className="space-y-6">
             {/* KPIs */}
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <KpiCard
                 label="Receita Total" icon={DollarSign} color="bg-green-500"
                 value={rev ? fmt(rev.summary.total) : '—'}
@@ -229,7 +229,7 @@ export default function ReportsPage() {
         {tab === 'occupancy' && (
           <div className="space-y-6">
             {/* KPIs */}
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <KpiCard
                 label="Taxa Média de Ocupação" icon={BedDouble} color="bg-blue-500"
                 value={occ ? `${occ.avgOccupancyRate}%` : '—'}

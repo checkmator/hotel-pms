@@ -60,14 +60,14 @@ function KpiCard({ label, value, sub, icon: Icon, color, href }: {
   icon: React.ElementType; color: string; href?: string;
 }) {
   const inner = (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-start gap-4 hover:shadow-sm transition-shadow h-full">
-      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${color}`}>
+    <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-start gap-3 hover:shadow-sm transition-shadow h-full">
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${color}`}>
         <Icon className="h-5 w-5 text-white" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500 font-medium">{label}</p>
-        <p className="text-2xl font-bold text-gray-900 mt-0.5">{value}</p>
-        {sub && <p className="text-xs text-gray-400 mt-0.5 truncate">{sub}</p>}
+        <p className="text-xs text-gray-500 font-medium leading-tight">{label}</p>
+        <p className="text-lg font-bold text-gray-900 mt-0.5 break-all sm:text-2xl">{value}</p>
+        {sub && <p className="text-xs text-gray-400 mt-0.5 leading-tight">{sub}</p>}
       </div>
       {href && <ArrowRight className="h-4 w-4 text-gray-300 shrink-0 mt-1" />}
     </div>
@@ -160,7 +160,7 @@ export default function DashboardContent() {
 
       <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
         {/* KPI Row */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <KpiCard
             label="Check-ins Hoje"
             value={today.checkInsCompleted}
@@ -194,7 +194,7 @@ export default function DashboardContent() {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
           {/* Room status breakdown */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <h3 className="text-sm font-semibold text-gray-900 mb-4">Status dos Quartos</h3>
