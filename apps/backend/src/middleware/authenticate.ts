@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 
 export interface JWTPayload {
-  sub: string;       // user id
+  sub: string;       // user id 
   role: 'admin' | 'reception' | 'housekeeping';
   email: string;
   iat: number;

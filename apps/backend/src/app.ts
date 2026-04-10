@@ -15,6 +15,7 @@ import { userRoutes } from './modules/users/users.routes';
 import { auditRoutes } from './modules/audit/audit.routes';
 import { dashboardRoutes } from './modules/dashboard/dashboard.routes';
 import { fiscalNoteRoutes } from './modules/fiscal/fiscal-note.routes';
+import { financialRoutes } from './modules/financial/index';
 
 export async function buildApp() {
   const app = Fastify({
@@ -69,6 +70,7 @@ export async function buildApp() {
   await app.register(auditRoutes);
   await app.register(dashboardRoutes);
   await app.register(fiscalNoteRoutes);
+  await app.register(financialRoutes);
 
   // ── Health check ────────────────────────────────────────────
   app.get('/health', async () => ({ status: 'ok', ts: new Date().toISOString() }));

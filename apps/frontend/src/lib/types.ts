@@ -255,6 +255,193 @@ export interface InvoicePreview {
   closedAt: string | null;
 }
 
+// ── Financial Module ──────────────────────────────────────────────────────────
+
+export type FinancialStatus = 'PENDING' | 'APPROVED' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED' | 'IN_DISPUTE';
+export type FinancialPaymentMethod = 'CASH' | 'PIX' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'BANK_TRANSFER' | 'BANK_SLIP' | 'CHECK' | 'OTA_TRANSFER' | 'VOUCHER' | 'OTHER';
+export type RecurrenceFrequency = 'MONTHLY' | 'BIMONTHLY' | 'QUARTERLY' | 'SEMIANNUAL' | 'ANNUAL';
+export type ARSourceType = 'RESERVATION' | 'EVENT' | 'RESTAURANT' | 'OTA' | 'AGENCY' | 'CORPORATE' | 'WALK_IN' | 'OTHER';
+export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface Supplier {
+  id: string;
+  name: string;
+  tradeName: string | null;
+  document: string;
+  documentType: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+  bankName: string | null;
+  bankBranch: string | null;
+  bankAccount: string | null;
+  pixKey: string | null;
+  notes: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+  parentId: string | null;
+  isActive: boolean;
+  children?: ExpenseCategory[];
+}
+
+export interface RevenueCategoryFinancial {
+  id: string;
+  name: string;
+  isActive: boolean;
+}
+
+export interface CostCenter {
+  id: string;
+  name: string;
+  code: string;
+  isActive: boolean;
+}
+
+export interface BankAccount {
+  id: string;
+  bankName: string;
+  branch: string;
+  accountNumber: string;
+  accountType: string;
+  balance: string;
+  isActive: boolean;
+}
+
+export interface FinancialInstallment {
+  id: number;
+  installmentNumber: number;
+  amount: string;
+  dueDate: string;
+  paidAmount: string;
+  status: FinancialStatus;
+}
+
+export interface FinancialPayment {
+  id: string;
+  amount: string;
+  paymentDate: string;
+  method: FinancialPaymentMethod;
+  transactionRef: string | null;
+  notes: string | null;
+  isReconciled: boolean;
+  bankAccount?: { bankName: string; accountNumber: string } | null;
+}
+
+export interface AccountPayable {
+  id: string;
+  code: string;
+  description: string;
+  totalAmount: string;
+  paidAmount: string;
+  dueDate: string;
+  issueDate: string;
+  paymentDate: string | null;
+  status: FinancialStatus;
+  approvalStatus: ApprovalStatus;
+  documentNumber: string | null;
+  documentType: string | null;
+  notes: string | null;
+  isRecurring: boolean;
+  issRetained: string | null;
+  irrfRetained: string | null;
+  supplier?: { id: string; name: string };
+  category?: { id: string; name: string };
+  costCenter?: { id: string; name: string };
+  createdBy?: { id: string; name: string };
+  approvedBy?: { id: string; name: string } | null;
+  installments?: FinancialInstallment[];
+  payments?: FinancialPayment[];
+  auditLogs?: Array<{ id: string; action: string; performedAt: string; performedById: string }>;
+  _count?: { installments: number; payments: number };
+}
+
+export interface AccountReceivable {
+  id: string;
+  code: string;
+  sourceType: ARSourceType;
+  description: string;
+  totalAmount: string;
+  receivedAmount: string;
+  dueDate: string;
+  issueDate: string;
+  receiptDate: string | null;
+  status: FinancialStatus;
+  documentNumber: string | null;
+  notes: string | null;
+  companyName: string | null;
+  otaName: string | null;
+  otaBookingRef: string | null;
+  otaCommissionRate: string | null;
+  otaCommissionAmt: string | null;
+  otaNetAmount: string | null;
+  isCityLedger: boolean;
+  cityLedgerRef: string | null;
+  category?: { id: string; name: string };
+  costCenter?: { id: string; name: string } | null;
+  createdBy?: { id: string; name: string };
+  installments?: FinancialInstallment[];
+  payments?: FinancialPayment[];
+  auditLogs?: Array<{ id: string; action: string; performedAt: string; performedById: string }>;
+  _count?: { installments: number; payments: number };
+}
+
+export interface FinancialKPIs {
+  totalAPPending: number;
+  totalAPCount: number;
+  totalARPending: number;
+  totalARCount: number;
+  overdueAP: number;
+  overdueAPCount: number;
+  overdueAR: number;
+  overdueARCount: number;
+  projectedBalance: number;
+}
+
+export interface CashFlowDay {
+  date: string;
+  inflow: number;
+  outflow: number;
+  balance: number;
+}
+
+export interface AgingBucket {
+  label: string;
+  minDays: number;
+  maxDays: number | null;
+  apCount: number;
+  apAmount: number;
+  arCount: number;
+  arAmount: number;
+}
+
+export interface FinancialDashboard {
+  kpis: FinancialKPIs;
+  upcomingAP: AccountPayable[];
+  upcomingAR: AccountReceivable[];
+  cashFlow: CashFlowDay[];
+  aging: AgingBucket[];
+}
+
+export interface Recurrence {
+  id: string;
+  description: string;
+  frequency: RecurrenceFrequency;
+  startDate: string;
+  endDate: string | null;
+  nextDueDate: string;
+  templateAmount: string;
+  isActive: boolean;
+  _count?: { payables: number };
+}
+
 // ── Fiscal Note (NFS-e) ───────────────────────────────────────────────────────
 export type FiscalNoteStatus = 'pending' | 'emitted' | 'cancelled' | 'error';
 

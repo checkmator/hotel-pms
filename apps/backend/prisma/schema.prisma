@@ -109,6 +109,12 @@ model User {
   auditLogs           AuditLog[]
   roomStatusChanges   RoomStatusHistory[]
 
+  // Financial module relations
+  payablesCreated     AccountPayable[]     @relation("APCreatedBy")
+  payablesApproved    AccountPayable[]     @relation("APApprovedBy")
+  receivablesCreated  AccountReceivable[]  @relation("ARCreatedBy")
+  financialPayments   FinancialPayment[]   @relation("FinPaymentCreatedBy")
+
   @@map("users")
 }
 
@@ -300,4 +306,341 @@ model RoomStatusHistory {
 
   @@index([roomId])
   @@map("room_status_history")
+}
+
+// ============================================================
+// FINANCIAL MODULE — Contas a Pagar & Contas a Receber
+// ============================================================
+
+enum FinancialStatus {
+  PENDING
+  APPROVED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+  IN_DISPUTE
+}
+
+enum FinancialPaymentMethod {
+  CASH
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  BANK_SLIP
+  CHECK
+  OTA_TRANSFER
+  VOUCHER
+  OTHER
+}
+
+enum RecurrenceFrequency {
+  MONTHLY
+  BIMONTHLY
+  QUARTERLY
+  SEMIANNUAL
+  ANNUAL
+}
+
+enum ARSourceType {
+  RESERVATION
+  EVENT
+  RESTAURANT
+  OTA
+  AGENCY
+  CORPORATE
+  WALK_IN
+  OTHER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Supplier {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(150)
+  tradeName    String?  @map("trade_name") @db.VarChar(150)
+  document     String   @unique @db.VarChar(20)
+  documentType String   @map("document_type") @db.VarChar(10)
+  email        String?  @db.VarChar(255)
+  phone        String?  @db.VarChar(20)
+  address      String?  @db.Text
+  city         String?  @db.VarChar(80)
+  state        String?  @db.VarChar(2)
+  zipCode      String?  @map("zip_code") @db.VarChar(10)
+  bankName     String?  @map("bank_name") @db.VarChar(60)
+  bankBranch   String?  @map("bank_branch") @db.VarChar(10)
+  bankAccount  String?  @map("bank_account") @db.VarChar(20)
+  pixKey       String?  @map("pix_key") @db.VarChar(100)
+  notes        String?  @db.Text
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  payables AccountPayable[]
+
+  @@map("suppliers")
+}
+
+model ExpenseCategory {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String  @unique @db.VarChar(80)
+  parentId String? @map("parent_id") @db.Uuid
+  isActive Boolean @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  parent   ExpenseCategory?  @relation("ExpenseCategoryTree", fields: [parentId], references: [id])
+  children ExpenseCategory[] @relation("ExpenseCategoryTree")
+  payables AccountPayable[]
+
+  @@map("expense_categories")
+}
+
+model RevenueCategory {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String  @unique @db.VarChar(80)
+  isActive Boolean @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  receivables AccountReceivable[]
+
+  @@map("revenue_categories")
+}
+
+model CostCenter {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String  @unique @db.VarChar(80)
+  code     String  @unique @db.VarChar(20)
+  isActive Boolean @default(true) @map("is_active")
+
+  payables    AccountPayable[]
+  receivables AccountReceivable[]
+
+  @@map("cost_centers")
+}
+
+model BankAccount {
+  id            String  @id @default(uuid()) @db.Uuid
+  bankName      String  @map("bank_name") @db.VarChar(80)
+  branch        String  @db.VarChar(10)
+  accountNumber String  @map("account_number") @db.VarChar(20)
+  accountType   String  @map("account_type") @db.VarChar(20)
+  balance       Decimal @default(0) @map("balance") @db.Decimal(14, 2)
+  isActive      Boolean @default(true) @map("is_active")
+
+  payments FinancialPayment[]
+
+  @@map("bank_accounts")
+}
+
+model Recurrence {
+  id             String              @id @default(uuid()) @db.Uuid
+  description    String              @db.VarChar(200)
+  frequency      RecurrenceFrequency
+  startDate      DateTime            @map("start_date") @db.Date
+  endDate        DateTime?           @map("end_date") @db.Date
+  nextDueDate    DateTime            @map("next_due_date") @db.Date
+  templateAmount Decimal             @map("template_amount") @db.Decimal(14, 2)
+  isActive       Boolean             @default(true) @map("is_active")
+  createdAt      DateTime            @default(now()) @map("created_at")
+
+  payables AccountPayable[]
+
+  @@map("recurrences")
+}
+
+model AccountPayable {
+  id             String          @id @default(uuid()) @db.Uuid
+  code           String          @unique @db.VarChar(20)
+  supplierId     String          @map("supplier_id") @db.Uuid
+  categoryId     String          @map("category_id") @db.Uuid
+  costCenterId   String          @map("cost_center_id") @db.Uuid
+  description    String          @db.VarChar(500)
+  totalAmount    Decimal         @map("total_amount") @db.Decimal(14, 2)
+  paidAmount     Decimal         @default(0) @map("paid_amount") @db.Decimal(14, 2)
+  currency       String          @default("BRL") @db.VarChar(3)
+  issueDate      DateTime        @map("issue_date") @db.Date
+  dueDate        DateTime        @map("due_date") @db.Date
+  paymentDate    DateTime?       @map("payment_date") @db.Date
+  status         FinancialStatus @default(PENDING)
+  documentNumber String?         @map("document_number") @db.VarChar(50)
+  documentType   String?         @map("document_type") @db.VarChar(30)
+  barcode        String?         @db.VarChar(100)
+  notes          String?         @db.Text
+
+  // Tax retentions
+  issRetained   Decimal? @map("iss_retained") @db.Decimal(14, 2)
+  irrfRetained  Decimal? @map("irrf_retained") @db.Decimal(14, 2)
+  pisRetained   Decimal? @map("pis_retained") @db.Decimal(14, 2)
+  cofinsRetained Decimal? @map("cofins_retained") @db.Decimal(14, 2)
+  csllRetained  Decimal? @map("csll_retained") @db.Decimal(14, 2)
+
+  // Recurrence
+  isRecurring  Boolean @default(false) @map("is_recurring")
+  recurrenceId String? @map("recurrence_id") @db.Uuid
+
+  // Approval
+  approvalStatus ApprovalStatus @default(PENDING) @map("approval_status")
+  approvedById   String?        @map("approved_by_id") @db.Uuid
+  approvedAt     DateTime?      @map("approved_at")
+
+  // Audit
+  createdById String   @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  supplier     Supplier        @relation(fields: [supplierId], references: [id])
+  category     ExpenseCategory @relation(fields: [categoryId], references: [id])
+  costCenter   CostCenter      @relation(fields: [costCenterId], references: [id])
+  recurrence   Recurrence?     @relation(fields: [recurrenceId], references: [id])
+  createdBy    User            @relation("APCreatedBy", fields: [createdById], references: [id])
+  approvedBy   User?           @relation("APApprovedBy", fields: [approvedById], references: [id])
+
+  installments  Installment[]
+  payments      FinancialPayment[]
+  attachments   FinancialAttachment[]
+  auditLogs     FinancialAuditLog[]
+
+  @@index([status, dueDate])
+  @@index([supplierId])
+  @@index([costCenterId])
+  @@map("accounts_payable")
+}
+
+model AccountReceivable {
+  id             String          @id @default(uuid()) @db.Uuid
+  code           String          @unique @db.VarChar(20)
+  sourceType     ARSourceType    @map("source_type")
+  categoryId     String          @map("category_id") @db.Uuid
+  costCenterId   String?         @map("cost_center_id") @db.Uuid
+  description    String          @db.VarChar(500)
+
+  // PMS references (optional)
+  reservationId  String?  @map("reservation_id") @db.Uuid
+  guestId        String?  @map("guest_id") @db.Uuid
+  companyName    String?  @map("company_name") @db.VarChar(150)
+
+  // OTA fields
+  otaName           String?  @map("ota_name") @db.VarChar(60)
+  otaBookingRef     String?  @map("ota_booking_ref") @db.VarChar(60)
+  otaCommissionRate Decimal? @map("ota_commission_rate") @db.Decimal(5, 2)
+  otaCommissionAmt  Decimal? @map("ota_commission_amt") @db.Decimal(14, 2)
+  otaNetAmount      Decimal? @map("ota_net_amount") @db.Decimal(14, 2)
+
+  totalAmount    Decimal         @map("total_amount") @db.Decimal(14, 2)
+  receivedAmount Decimal         @default(0) @map("received_amount") @db.Decimal(14, 2)
+  currency       String          @default("BRL") @db.VarChar(3)
+  issueDate      DateTime        @map("issue_date") @db.Date
+  dueDate        DateTime        @map("due_date") @db.Date
+  receiptDate    DateTime?       @map("receipt_date") @db.Date
+  status         FinancialStatus @default(PENDING)
+  documentNumber String?         @map("document_number") @db.VarChar(50)
+  notes          String?         @db.Text
+
+  // City Ledger
+  isCityLedger  Boolean @default(false) @map("is_city_ledger")
+  cityLedgerRef String? @map("city_ledger_ref") @db.VarChar(50)
+
+  // Audit
+  createdById String   @map("created_by_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  category   RevenueCategory @relation(fields: [categoryId], references: [id])
+  costCenter CostCenter?     @relation(fields: [costCenterId], references: [id])
+  createdBy  User            @relation("ARCreatedBy", fields: [createdById], references: [id])
+
+  installments Installment[]
+  payments     FinancialPayment[]
+  attachments  FinancialAttachment[]
+  auditLogs    FinancialAuditLog[]
+
+  @@index([status, dueDate])
+  @@index([sourceType])
+  @@index([reservationId])
+  @@map("accounts_receivable")
+}
+
+model Installment {
+  id                 Int             @id @default(autoincrement())
+  installmentNumber  Int             @map("installment_number")
+  amount             Decimal         @db.Decimal(14, 2)
+  dueDate            DateTime        @map("due_date") @db.Date
+  paidAmount         Decimal         @default(0) @map("paid_amount") @db.Decimal(14, 2)
+  status             FinancialStatus @default(PENDING)
+  payableId          String?         @map("payable_id") @db.Uuid
+  receivableId       String?         @map("receivable_id") @db.Uuid
+
+  payable    AccountPayable?    @relation(fields: [payableId], references: [id])
+  receivable AccountReceivable? @relation(fields: [receivableId], references: [id])
+  payments   FinancialPayment[]
+
+  @@map("installments")
+}
+
+model FinancialPayment {
+  id             String                 @id @default(uuid()) @db.Uuid
+  amount         Decimal                @db.Decimal(14, 2)
+  paymentDate    DateTime               @map("payment_date") @db.Date
+  method         FinancialPaymentMethod
+  bankAccountId  String?                @map("bank_account_id") @db.Uuid
+  transactionRef String?                @map("transaction_ref") @db.VarChar(100)
+  notes          String?                @db.Text
+  payableId      String?                @map("payable_id") @db.Uuid
+  receivableId   String?                @map("receivable_id") @db.Uuid
+  installmentId  Int?                   @map("installment_id")
+  isReconciled   Boolean                @default(false) @map("is_reconciled")
+  reconciledAt   DateTime?              @map("reconciled_at")
+  createdById    String                 @map("created_by_id") @db.Uuid
+  createdAt      DateTime               @default(now()) @map("created_at")
+
+  bankAccount  BankAccount?       @relation(fields: [bankAccountId], references: [id])
+  payable      AccountPayable?    @relation(fields: [payableId], references: [id])
+  receivable   AccountReceivable? @relation(fields: [receivableId], references: [id])
+  installment  Installment?       @relation(fields: [installmentId], references: [id])
+  createdBy    User               @relation("FinPaymentCreatedBy", fields: [createdById], references: [id])
+
+  @@index([payableId])
+  @@index([receivableId])
+  @@map("financial_payments")
+}
+
+model FinancialAttachment {
+  id            String   @id @default(uuid()) @db.Uuid
+  fileName      String   @map("file_name") @db.VarChar(255)
+  fileUrl       String   @map("file_url") @db.Text
+  fileType      String   @map("file_type") @db.VarChar(50)
+  fileSizeBytes Int      @map("file_size_bytes")
+  payableId     String?  @map("payable_id") @db.Uuid
+  receivableId  String?  @map("receivable_id") @db.Uuid
+  uploadedById  String   @map("uploaded_by_id") @db.Uuid
+  uploadedAt    DateTime @default(now()) @map("uploaded_at")
+
+  payable    AccountPayable?    @relation(fields: [payableId], references: [id])
+  receivable AccountReceivable? @relation(fields: [receivableId], references: [id])
+
+  @@map("financial_attachments")
+}
+
+model FinancialAuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  action        String   @db.VarChar(30)
+  entityType    String   @map("entity_type") @db.VarChar(30)
+  entityId      String   @map("entity_id") @db.Uuid
+  changes       Json?
+  performedById String   @map("performed_by_id") @db.Uuid
+  performedAt   DateTime @default(now()) @map("performed_at")
+  ipAddress     String?  @map("ip_address") @db.VarChar(45)
+  payableId     String?  @map("payable_id") @db.Uuid
+  receivableId  String?  @map("receivable_id") @db.Uuid
+
+  payable    AccountPayable?    @relation(fields: [payableId], references: [id])
+  receivable AccountReceivable? @relation(fields: [receivableId], references: [id])
+
+  @@index([entityType, entityId])
+  @@map("financial_audit_logs")
 }

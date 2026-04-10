@@ -15,6 +15,7 @@ import {
   BedDouble,
   LayoutDashboard,
   BookOpen,
+  DollarSign,
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -36,6 +37,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/housekeeping', label: 'Governança',           icon: Sparkles,        roles: ['admin', 'reception', 'housekeeping'] },
   { href: '/rooms',        label: 'Quartos',              icon: BedDouble,       roles: ['admin'] },
   { href: '/reports',      label: 'Relatórios',           icon: BarChart3,       roles: ['admin', 'reception'] },
+  { href: '/financial',   label: 'Financeiro',            icon: DollarSign,      roles: ['admin'] },
   { href: '/users',        label: 'Funcionários',          icon: UserCog,         roles: ['admin'] },
   { href: '/audit',        label: 'Auditoria',             icon: ClipboardList,   roles: ['admin'] },
 ];

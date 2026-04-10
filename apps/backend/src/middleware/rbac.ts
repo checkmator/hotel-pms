@@ -16,6 +16,10 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 //  invoices:close          ✓        ✓             ✗
 //  users:manage            ✓        ✗             ✗
 //  audit_logs:read         ✓        ✗             ✗
+//  reports:read            ✓        ✓             ✗
+//  financial:read          ✓        ✓             ✗
+//  financial:write         ✓        ✗             ✗
+//  financial:approve       ✓        ✗             ✗
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -32,7 +36,10 @@ type Permission =
   | 'invoices:close'
   | 'users:manage'
   | 'audit_logs:read'
-  | 'reports:read';
+  | 'reports:read'
+  | 'financial:read'
+  | 'financial:write'
+  | 'financial:approve';
 
 type Role = 'admin' | 'reception' | 'housekeeping';
 
@@ -51,6 +58,9 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'users:manage',
     'audit_logs:read',
     'reports:read',
+    'financial:read',
+    'financial:write',
+    'financial:approve',
   ],
   reception: [
     'rooms:read',
@@ -63,6 +73,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'transactions:write',
     'invoices:close',
     'reports:read',
+    'financial:read',
   ],
   housekeeping: [
     'rooms:read',

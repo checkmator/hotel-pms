@@ -6,9 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 interface HeaderProps {
   title: string;
   subtitle?: string;
+  action?: React.ReactNode;
 }
 
-export function Header({ title, subtitle }: HeaderProps) {
+export function Header({ title, subtitle, action }: HeaderProps) {
   const { user } = useAuth();
 
   return (
@@ -19,6 +20,7 @@ export function Header({ title, subtitle }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2 lg:gap-3">
+        {action}
         <button className="relative rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
           <Bell className="h-5 w-5" />
         </button>
