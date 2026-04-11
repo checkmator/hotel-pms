@@ -161,10 +161,10 @@ async function main() {
 
   // ── Recurrence ───────────────────────────────────────────────
   await prisma.recurrence.upsert({
-    where: { id: '00000000-0000-0000-0000-000000000r01' },
+    where: { id: '00000000-0000-0000-0000-000000000001' },
     update: {},
     create: {
-      id: '00000000-0000-0000-0000-000000000r01',
+      id: '00000000-0000-0000-0000-000000000001',
       description: 'Licença software PMS – Mensal',
       frequency: 'MONTHLY',
       startDate: new Date('2026-01-01'),
